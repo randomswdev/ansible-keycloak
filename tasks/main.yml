@@ -1,6 +1,7 @@
 ---
 
 - name: check for an existing deployment
+  tags: facts
   stat:
     path: "{{ keycloak_jboss_home }}"
   register: existing_deploy
@@ -323,8 +324,6 @@
           - --timeout={{ keycloak_jboss_config_connect_timeout }}
           - --command-timeout={{ keycloak_jboss_config_command_timeout }}
           - --file={{ keycloak_config_dir }}/reverse-proxy-config.cli
-        notify:
-          - restart keycloak
         tags:
           - skip_ansible_lint
       - name: clean up jboss-cli-sh command file
