@@ -1,0 +1,5 @@
+/socket-binding-group=standard-sockets/socket-binding=proxy-https:add(port={{ socket_binding_proxy_port }})
+/subsystem=undertow/server=default-server/http-listener=default:write-attribute(name=proxy-address-forwarding,value=true)
+reload
+/subsystem=undertow/server=default-server/http-listener=default:write-attribute(name=redirect-socket,value=proxy-https)
+reload

@@ -127,6 +127,9 @@ configuration file
 See `roles/keycloak/defaults/main.yml` for a list of other variable
 defaults that one may want to override.
 
+To use keycloak behind a reverse proxy set the variable `keycloak_reverse_proxy` to True.:
+`socket_binding_proxy_port`: Configure the reverse proxy port(X-Forwarded-Port).
+
 ## Testing
 
 In-tree tests are provided that use molecule to test the role against
