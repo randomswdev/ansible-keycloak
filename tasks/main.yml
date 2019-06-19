@@ -1,7 +1,7 @@
 ---
 
 - name: check for an existing deployment
-  tags: facts
+  tags: checks
   stat:
     path: "{{ keycloak_jboss_home }}"
   register: existing_deploy
@@ -25,6 +25,7 @@
   when: existing_deploy.stat.exists and keycloak_force_install|bool
 
 - name: check for an existing deployment after possible forced removal
+  tags: checks
   stat:
     path: "{{ keycloak_jboss_home }}"
   register: existing_deploy
@@ -301,7 +302,8 @@
             (keycloak_generated_pkcs12_bundle is changed)
 
     - name: make Keycloak aware of reverse proxy
-      tags: proxy
+      tags:
+        - proxy
       block:
       - name: wait for Keycloak management interface to be available
         #TODO fix keycloak_force_install issue
@@ -331,6 +333,5 @@
           path: "{{ keycloak_config_dir }}/reverse-proxy-config.cli"
           state: absent
       become: yes
-      when:
-        - keycloak_reverse_proxy
+      when: keycloak_reverse_proxy == true
   when: not existing_deploy.stat.exists
