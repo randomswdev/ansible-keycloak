@@ -332,4 +332,4 @@
       path: "{{ keycloak_config_dir }}/reverse-proxy-config.cli"
       state: absent
   become: yes
-  when: keycloak_reverse_proxy
+  when: keycloak_https_proxy_address_forwarding

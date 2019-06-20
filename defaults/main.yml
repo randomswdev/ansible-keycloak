@@ -52,7 +52,7 @@ keycloak_configure_firewall: true
 
 ##Reverse proxy
 # Behind reverse proxy?
-keycloak_reverse_proxy: false
+keycloak_https_proxy_address_forwarding: false
 socket_binding_proxy_port: 443
 #Issues
 #Sadly after second run the server no longer comes up
