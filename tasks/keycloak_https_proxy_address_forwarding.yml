@@ -2,10 +2,10 @@
   service:
     name: keycloak
     state: started
-- name: create reverse-proxy-config.cli command file
+- name: create keycloak-https-proxy-address-forwarding.cli command file
   template:
-    src: reverse-proxy-config.cli.j2
-    dest: "{{ keycloak_config_dir }}/reverse-proxy-config.cli"
+    src: keycloak-https-proxy-address-forwarding.cli.j2
+    dest: "{{ keycloak_config_dir }}/keycloak-https-proxy-address-forwarding.cli"
     owner: root
     group: root
     mode: 0600
@@ -17,10 +17,10 @@
     - --connect
     - --timeout={{ keycloak_jboss_config_connect_timeout }}
     - --command-timeout={{ keycloak_jboss_config_command_timeout }}
-    - --file={{ keycloak_config_dir }}/reverse-proxy-config.cli
+    - --file={{ keycloak_config_dir }}/keycloak-https-proxy-address-forwarding.cli
   tags:
   - skip_ansible_lint
 - name: clean up jboss-cli-sh command file
   file:
-    path: "{{ keycloak_config_dir }}/reverse-proxy-config.cli"
+    path: "{{ keycloak_config_dir }}/keycloak-https-proxy-address-forwarding.cli"
     state: absent
