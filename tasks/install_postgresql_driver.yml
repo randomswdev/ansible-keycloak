@@ -1,0 +1,23 @@
+- name: Creates jdbc_postgres_driver_dir directory
+  file: path="{{ jdbc_postgres_driver_dir }}" state=directory
+#- name: offline install jdbc postgres driver
+#  copy:
+#    url: "{{ jdbc_postgres_driver_binary }}"
+#    dest: "{{ jdbc_postgres_driver_dir }}"
+#    owner: "{{ keycloak_service_user }}"
+#    group: "{{ keycloak_service_group }}"
+#    when: jdbc_postgres_driver_url is not defined
+
+- name: Download jdbc postgres driver installer
+  get_url:
+    url: "{{ jdbc_postgres_driver_url }}"
+    dest: "{{ jdbc_postgres_driver_dir }}/postgres-jdbc.jar"
+    owner: "{{ keycloak_service_user }}"
+    group: "{{ keycloak_service_group }}"
+
+- name: copy keycloak postgresql module.xml to jdbc driver dir
+  copy:
+    src: "files/postgresql/module.xml"
+    dest: "{{ jdbc_postgres_driver_dir }}"
+    owner: "{{ keycloak_service_user }}"
+    group: "{{ keycloak_service_group }}"

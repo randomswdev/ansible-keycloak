@@ -112,18 +112,13 @@
           become: yes
       when: not keycloak_archive_on_target
 
-    - name: create Keycloak admin user
-      command:
-      args:
-        argv:
-          - "{{ keycloak_jboss_home }}/bin/add-user-keycloak.sh"
-          - -r master
-          - -u {{ keycloak_admin_user }}
-          - -p {{ keycloak_admin_password }}
-        creates: "{{ keycloak_config_dir }}/keycloak-add-user.json"
+    - name: Configure Keycloak postgresql database
+      include: install_postgresql_driver.yml
       become: yes
+      when: db_addr is defined
       tags:
-        - skip_ansible_lint
+      - install_postgresql
+
 
     - name: validate and set PKCS12 variables
       block:
@@ -307,3 +302,25 @@
   when: keycloak_https_proxy_address_forwarding is defined
   tags:
   - proxy
+
+- name: Configure Keycloak postgresql database
+  include: external_postgresql_database.yml
+  become: yes
+  when: db_addr is defined
+  tags:
+  - postgresql
+
+- name: create Keycloak admin user
+  command:
+  args:
+    argv:
+    - "{{ keycloak_jboss_home }}/bin/add-user-keycloak.sh"
+    - -r master
+    - -u {{ keycloak_admin_user }}
+    - -p {{ keycloak_admin_password }}
+    creates: "{{ keycloak_config_dir }}/keycloak-add-user.json"
+  become: yes
+  notify:
+  - restart keycloak
+  tags:
+    - create_user
