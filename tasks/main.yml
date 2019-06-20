@@ -1,7 +1,6 @@
 ---
 
 - name: check for an existing deployment
-  tags: checks
   stat:
     path: "{{ keycloak_jboss_home }}"
   register: existing_deploy
@@ -25,7 +24,6 @@
   when: existing_deploy.stat.exists and keycloak_force_install|bool
 
 - name: check for an existing deployment after possible forced removal
-  tags: checks
   stat:
     path: "{{ keycloak_jboss_home }}"
   register: existing_deploy
@@ -301,37 +299,37 @@
       when: (keycloak_tls_pkcs12 is defined) or
             (keycloak_generated_pkcs12_bundle is changed)
 
-    - name: make Keycloak aware of reverse proxy
-      tags:
-        - proxy
-      block:
-      - name: wait for Keycloak management interface to be available
-        #TODO fix keycloak_force_install issue
-        wait_for:
-          port: "{{ keycloak_management_http_port }}"
-          timeout: "{{ keycloak_startup_timeout }}"
-      - name: create jboss-cli.sh command file
-        template:
-          src: reverse-proxy-config.cli.j2
-          dest: "{{ keycloak_config_dir }}/reverse-proxy-config.cli"
-          owner: root
-          group: root
-          mode: 0600
-      - name: apply keycloak proxy configuration
-        command:
-        args:
-          argv:
-          - "{{ keycloak_jboss_home }}/bin/jboss-cli.sh"
-          - --connect
-          - --timeout={{ keycloak_jboss_config_connect_timeout }}
-          - --command-timeout={{ keycloak_jboss_config_command_timeout }}
-          - --file={{ keycloak_config_dir }}/reverse-proxy-config.cli
-        tags:
-          - skip_ansible_lint
-      - name: clean up jboss-cli-sh command file
-        file:
-          path: "{{ keycloak_config_dir }}/reverse-proxy-config.cli"
-          state: absent
-      become: yes
-      when: keycloak_reverse_proxy == true
   when: not existing_deploy.stat.exists
+
+- name: Make Keycloak aware of reverse proxy
+  tags:
+  - proxy
+  block:
+  - name: Ensure Keycloak is started
+    service:
+      name: keycloak
+      state: started
+  - name: create reverse-proxy-config.cli command file
+    template:
+      src: reverse-proxy-config.cli.j2
+      dest: "{{ keycloak_config_dir }}/reverse-proxy-config.cli"
+      owner: root
+      group: root
+      mode: 0600
+  - name: apply keycloak proxy configuration
+    command:
+    args:
+      argv:
+      - "{{ keycloak_jboss_home }}/bin/jboss-cli.sh"
+      - --connect
+      - --timeout={{ keycloak_jboss_config_connect_timeout }}
+      - --command-timeout={{ keycloak_jboss_config_command_timeout }}
+      - --file={{ keycloak_config_dir }}/reverse-proxy-config.cli
+    tags:
+    - skip_ansible_lint
+  - name: clean up jboss-cli-sh command file
+    file:
+      path: "{{ keycloak_config_dir }}/reverse-proxy-config.cli"
+      state: absent
+  become: yes
+  when: keycloak_reverse_proxy
