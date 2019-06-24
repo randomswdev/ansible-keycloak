@@ -2,6 +2,10 @@
   service:
     name: keycloak
     state: started
+- name: wait for Keycloak management interface to be available
+  wait_for:
+    port: "{{ keycloak_management_http_port }}"
+    timeout: "{{ keycloak_startup_timeout }}"
 - name: create keycloak-https-proxy-address-forwarding.cli command file
   template:
     src: keycloak-https-proxy-address-forwarding.cli.j2
