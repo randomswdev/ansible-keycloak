@@ -45,6 +45,7 @@
         ansible_python_interpreter: "/usr/bin/python2"
 
     - name: create local download location
+      become: False
       delegate_to: localhost
       file:
         dest: "{{ keycloak_local_download_dest }}"
@@ -79,6 +80,7 @@
 
     - block:
         - name: download Keycloak archive to target
+          become: False
           get_url:
             url: "{{ keycloak_url }}"
             dest: "{{ keycloak_dest }}"
@@ -97,6 +99,7 @@
 
     - block:
         - name: download Keycloak archive to local
+          become: False
           delegate_to: localhost
           get_url:
             url: "{{ keycloak_url }}"
