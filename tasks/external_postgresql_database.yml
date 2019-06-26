@@ -2,10 +2,12 @@
   service:
     name: keycloak
     state: started
+
 - name: wait for Keycloak management interface to be available
   wait_for:
     port: "{{ keycloak_management_http_port }}"
     timeout: "{{ keycloak_startup_timeout }}"
+
 - name: Create jboss-cli.sh postgresql database command file
   template:
     src: postgresql-config.cli.j2
@@ -13,6 +15,7 @@
     owner: root
     group: root
     mode: 0600
+
 - name: Apply keycloak postgresql database configuration
   command:
   args:
@@ -24,7 +27,4 @@
     - --file={{ keycloak_config_dir }}/postgresql-config.cli
   tags:
   - skip_ansible_lint
-- name: Clean up jboss-cli-sh postgresql database command file
-  file:
-    path: "{{ keycloak_config_dir }}/postgresql-config.cli"
-    state: absent
+
