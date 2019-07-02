@@ -67,3 +67,8 @@ jdbc_params:
 jdbc_postgres_version: 42.2.5
 jdbc_postgres_driver_url: "https://repo1.maven.org/maven2/org/postgresql/postgresql/{{jdbc_postgres_version}}/postgresql-{{jdbc_postgres_version}}.jar"
 jdbc_postgres_driver_dir: "{{keycloak_jboss_home}}/modules/system/layers/base/org/postgresql/jdbc/main"
+
+#Logstash defaults
+keycloak_jboss_logmanager_ext_url: "https://repo1.maven.org/maven2/org/jboss/logmanager/jboss-logmanager-ext/1.0.0.Alpha5/jboss-logmanager-ext-1.0.0.Alpha5.jar"
+keycloak_jboss_logmanager_ext_location: "{{ keycloak_jboss_home }}/jboss-logmanager-ext-1.0.0.Alpha5.jar"
+keycloak_logstash_port: 9200

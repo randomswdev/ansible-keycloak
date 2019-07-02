@@ -86,6 +86,7 @@
             dest: "{{ keycloak_dest }}"
             owner: "{{ keycloak_service_user }}"
             group: "{{ keycloak_service_group }}"
+
         - name: extract Keycloak archive on target
           unarchive:
             remote_src: yes
@@ -312,6 +313,13 @@
   when: db_addr is defined
   tags:
   - postgresql
+
+- name: Configure logstash
+  include: logstash.yml
+  become: yes
+  when: keycloak_logstash_host is defined
+  tags:
+  - logstash
 
 - name: create Keycloak admin user
   command:

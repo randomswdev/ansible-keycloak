@@ -1,0 +1,34 @@
+- name: "download jboss logmanager extention"
+  get_url:
+    url: "{{ keycloak_jboss_logmanager_ext_url }}"
+    dest: "{{ keycloak_jboss_logmanager_ext_location }}"
+    owner: "{{ keycloak_service_user }}"
+    group: "{{ keycloak_service_group }}"
+
+- name: Ensure Keycloak is started
+  service:
+    name: keycloak
+    state: started
+
+- name: wait for Keycloak management interface to be available
+  wait_for:
+    port: "{{ keycloak_management_http_port }}"
+    timeout: "{{ keycloak_startup_timeout }}"
+
+- name: Create jboss-cli.sh logstash module command file
+  template:
+    src: logstash.cli.j2
+    dest: "{{ keycloak_config_dir }}/logstash-config.cli"
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Apply keycloak logstash configuration
+  command:
+  args:
+    argv:
+    - "{{ keycloak_jboss_home }}/bin/jboss-cli.sh"
+    - --connect
+    - --timeout={{ keycloak_jboss_config_connect_timeout }}
+    - --command-timeout={{ keycloak_jboss_config_command_timeout }}
+    - --file={{ keycloak_config_dir }}/logstash-config.cli

@@ -138,6 +138,12 @@ To configure keycloak to use an external postgresql database, set the following 
 `db_user`: Specify user to use to authenticate to postgresql (optional, default is keycloak).
 `db_password`: Specify user's password to use to authenticate to postgresql (optional, default is password).
 `jdbc_params` : Specific (optional) settings for example `connectTimeout=30` 
+
+To configure keycloak to send logfiles to logstash, set the following variables:
+`keycloak_logstash_host`: Specify hostname of logstash
+`keycloak_logstash_port`: Specify port of logstash (optional, default is 9200)
+
+
 ## Testing
 
 In-tree tests are provided that use molecule to test the role against
