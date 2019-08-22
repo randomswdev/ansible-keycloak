@@ -1,0 +1,30 @@
+- name: Ensure Keycloak is started
+  service:
+    name: keycloak
+    state: started
+
+- name: wait for Keycloak management interface to be available
+  wait_for:
+    port: "{{ keycloak_management_http_port }}"
+    timeout: "{{ keycloak_startup_timeout }}"
+
+- name: Create jboss-cli.sh postgresql database command file
+  template:
+    src: postgresql-config.cli.j2
+    dest: "{{ keycloak_config_dir }}/postgresql-config.cli"
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Apply keycloak postgresql database configuration
+  command:
+  args:
+    argv:
+    - "{{ keycloak_jboss_home }}/bin/jboss-cli.sh"
+    - --connect
+    - --timeout={{ keycloak_jboss_config_connect_timeout }}
+    - --command-timeout={{ keycloak_jboss_config_command_timeout }}
+    - --file={{ keycloak_config_dir }}/postgresql-config.cli
+  tags:
+  - skip_ansible_lint
+

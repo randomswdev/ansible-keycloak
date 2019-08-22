@@ -127,6 +127,17 @@ configuration file
 See `roles/keycloak/defaults/main.yml` for a list of other variable
 defaults that one may want to override.
 
+To use keycloak behind a reverse proxy set the variable `keycloak_https_proxy_address_forwarding` to true.:
+`socket_binding_proxy_port`: Configure the reverse proxy port(X-Forwarded-Port).
+
+To configure keycloak to use an external postgresql database, set the following variables:
+`db_addr`: Specify hostname of postgresql
+`db_port`: Specify port of postgresql (optional, default is DB vendor default port)
+`db_database`: Specify name of postgresql to use (optional, default is keycloak).
+`db_schema`: Specify name of the schema to use for DB that support schemas (optional, default is public on Postgres).
+`db_user`: Specify user to use to authenticate to postgresql (optional, default is keycloak).
+`db_password`: Specify user's password to use to authenticate to postgresql (optional, default is password).
+`jdbc_params` : Specific (optional) settings for example `connectTimeout=30` 
 ## Testing
 
 In-tree tests are provided that use molecule to test the role against

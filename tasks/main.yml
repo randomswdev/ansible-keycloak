@@ -39,9 +39,13 @@
       when: keycloak_admin_password is not defined
 
     - name: set the python interpreter to use on the target
-      import_tasks: "{{ role_path }}/tasks/python_2_3_test.yml"
+      #TODO Fix python 3 issue on CentOS Linux release 7.6.1810:
+      #import_tasks: "{{ role_path }}/tasks/python_2_3_test.yml"
+      set_fact:
+        ansible_python_interpreter: "/usr/bin/python2"
 
     - name: create local download location
+      become: False
       delegate_to: localhost
       file:
         dest: "{{ keycloak_local_download_dest }}"
@@ -76,6 +80,7 @@
 
     - block:
         - name: download Keycloak archive to target
+          become: False
           get_url:
             url: "{{ keycloak_url }}"
             dest: "{{ keycloak_dest }}"
@@ -94,6 +99,7 @@
 
     - block:
         - name: download Keycloak archive to local
+          become: False
           delegate_to: localhost
           get_url:
             url: "{{ keycloak_url }}"
@@ -109,18 +115,13 @@
           become: yes
       when: not keycloak_archive_on_target
 
-    - name: create Keycloak admin user
-      command:
-      args:
-        argv:
-          - "{{ keycloak_jboss_home }}/bin/add-user-keycloak.sh"
-          - -r master
-          - -u {{ keycloak_admin_user }}
-          - -p {{ keycloak_admin_password }}
-        creates: "{{ keycloak_config_dir }}/keycloak-add-user.json"
+    - name: Configure Keycloak postgresql database
+      include: install_postgresql_driver.yml
       become: yes
+      when: db_addr is defined
       tags:
-        - skip_ansible_lint
+      - install_postgresql
+
 
     - name: validate and set PKCS12 variables
       block:
@@ -295,4 +296,34 @@
       become: yes
       when: (keycloak_tls_pkcs12 is defined) or
             (keycloak_generated_pkcs12_bundle is changed)
+
   when: not existing_deploy.stat.exists
+
+- name: Make Keycloak aware of reverse proxy
+  become: yes
+  include: keycloak_https_proxy_address_forwarding.yml
+  when: keycloak_https_proxy_address_forwarding is defined
+  tags:
+  - proxy
+
+- name: Configure Keycloak postgresql database
+  include: external_postgresql_database.yml
+  become: yes
+  when: db_addr is defined
+  tags:
+  - postgresql
+
+- name: create Keycloak admin user
+  command:
+  args:
+    argv:
+    - "{{ keycloak_jboss_home }}/bin/add-user-keycloak.sh"
+    - -r master
+    - -u {{ keycloak_admin_user }}
+    - -p {{ keycloak_admin_password }}
+    creates: "{{ keycloak_config_dir }}/keycloak-add-user.json"
+  become: yes
+  notify:
+  - restart keycloak
+  tags:
+    - create_user

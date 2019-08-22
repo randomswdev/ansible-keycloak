@@ -52,3 +52,21 @@ keycloak_configure_firewall: true
 
 # Configure the JAVA_OPTS used by the Keycloak service
 keycloak_java_opts: "-Xms1024m -Xmx20480m -XX:MaxPermSize=768m"
+
+##Reverse proxy
+# Behind reverse proxy?
+keycloak_https_proxy_address_forwarding: false
+socket_binding_proxy_port: 443
+#Issues
+#Sadly after second run the server no longer comes up
+
+##external postgresql database defaults
+db_port: 5432
+db_database: keycloak
+db_schema: public
+db_user: keycloak
+db_password: password
+jdbc_params:
+jdbc_postgres_version: 42.2.5
+jdbc_postgres_driver_url: "https://repo1.maven.org/maven2/org/postgresql/postgresql/{{jdbc_postgres_version}}/postgresql-{{jdbc_postgres_version}}.jar"
+jdbc_postgres_driver_dir: "{{keycloak_jboss_home}}/modules/system/layers/base/org/postgresql/jdbc/main"
