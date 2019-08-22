@@ -27,4 +27,3 @@
     - --file={{ keycloak_config_dir }}/postgresql-config.cli
   tags:
   - skip_ansible_lint
-
