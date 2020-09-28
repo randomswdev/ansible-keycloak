@@ -318,9 +318,12 @@
   args:
     argv:
     - "{{ keycloak_jboss_home }}/bin/add-user-keycloak.sh"
-    - -r master
-    - -u {{ keycloak_admin_user }}
-    - -p {{ keycloak_admin_password }}
+    - -r
+    - master
+    - -u
+    - {{ keycloak_admin_user }}
+    - -p
+    - {{ keycloak_admin_password }}
     creates: "{{ keycloak_config_dir }}/keycloak-add-user.json"
   become: yes
   notify:
